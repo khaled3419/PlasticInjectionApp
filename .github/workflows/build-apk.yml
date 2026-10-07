@@ -1,3 +1,4 @@
+
 name: Build Android APK
 
 on:
@@ -12,30 +13,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. جلب الكود من المستودع
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 2. إعداد بيئة .NET SDK
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '9.0.x'
 
-      # 3. تثبيت بيئة العمل MAUI للأندرويد بشكل صحيح
       - name: Install MAUI Workload
         run: dotnet workload install maui-android
 
-      # 4. بناء ملف ה-APK وإتاحة الحزم الحديثة أثناء البناء
       - name: Build Android APK
         run: |
-          dotnet publish -f net8.0-android -c Release /p:AndroidBuildApplication=true /p:AndroidPackageFormat=apk /p:EnableNETAnalyzers=false
+          dotnet publish -f net9.0-android -c Release /p:AndroidBuildApplication=true /p:AndroidPackageFormat=apk /p:CheckEolTargetFramework=false
 
-      # 5. رفع ملف ה-APK الناتج
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: PlasticInjectionApp-APK
-          path: '**/bin/Release/net8.0-android/*-Signed.apk'
+          path: '**/bin/Release/net9.0-android/*-Signed.apk'
 
 
