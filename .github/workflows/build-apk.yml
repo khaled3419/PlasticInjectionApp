@@ -1,37 +1,39 @@
-
 name: Build Android APK
 
 on:
   push:
-    branches:
-      - main
-      - master
+    branches: [ "main", "master" ]
   workflow_dispatch:
 
 jobs:
-  build:
+  build-android:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+    - name: Checkout Code
+      uses: actions/checkout@v4
 
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '9.0.x'
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
 
-      - name: Install MAUI Workload
-        run: dotnet workload install maui-android
+    - name: Install MAUI Android Workload
+      run: dotnet workload install maui-android
 
-      - name: Build Android APK
-        run: |
-          dotnet publish -f net9.0-android -c Release /p:AndroidBuildApplication=true /p:AndroidPackageFormat=apk /p:CheckEolTargetFramework=false
+    - name: Restore Dependencies
+      run: dotnet restore MouldCheckerApp.csproj
 
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: PlasticInjectionApp-APK
-          path: '**/bin/Release/net9.0-android/*-Signed.apk'
+    - name: Build Android Unsigned APK
+      run: |
+        dotnet build MouldCheckerApp.csproj -c Release -f net8.0-android /p:AndroidPackageFormat=apk /p:AndroidEnablePackageSigning=false
+
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: MouldChecker-APK
+        path: '**/bin/Release/net8.0-android/*.apk'
+        
+
 
 
